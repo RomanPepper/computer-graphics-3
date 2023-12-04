@@ -30,10 +30,11 @@ public class GeometryUtils {
     /**
      * @param v1 the first three-dimensional vector
      * @param v2 the second three-dimensional vector
-     * @return vector orthogonal to the first and second vectors
+     * @return vector orthogonal to the first and second vectors (right-hand for Cartesian right-system)
      */
     public static Vector3f vectorProduct(Vector3f v1, Vector3f v2) {
-        return new Vector3f(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x);
+        return new Vector3f(v1.y * v2.z - v1.z * v2.y,
+                v1.z * v2.x - v1.x * v2.z,
+                v1.x * v2.y - v1.y * v2.x);
     }
 }
-
