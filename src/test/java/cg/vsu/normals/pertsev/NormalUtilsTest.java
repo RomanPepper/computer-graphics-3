@@ -13,10 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NormalUtilsTest {
+    private final String projectDir = System.getProperty("user.dir");
+    private final String brickFilePath = projectDir + "\\src\\main\\resources\\obj\\brick.obj";
+    private final String pyramidFilePath = projectDir + "\\src\\main\\resources\\obj\\pyramid.obj";
+
     @Test
     public void normalToPolygon1() throws FileNotFoundException {
-        Model model = ObjReader.read("D:\\vsu\\3rd_semester\\cg\\" +
-                "_3rd_task\\src\\main\\resources\\obj\\brick.obj");
+        Model model = ObjReader.read(brickFilePath);
 
         Polygon randomPolygon = model.polygons.get(0);
 
@@ -32,8 +35,7 @@ public class NormalUtilsTest {
 
     @Test
     public void normalToPolygon2() throws FileNotFoundException {
-        Model model = ObjReader.read("D:\\vsu\\3rd_semester\\cg\\" +
-                "_3rd_task\\src\\main\\resources\\obj\\brick.obj");
+        Model model = ObjReader.read(brickFilePath);
 
         Polygon randomPolygon = model.polygons.get(1);
 
@@ -49,8 +51,7 @@ public class NormalUtilsTest {
 
     @Test
     public void normalToPolygon3() throws FileNotFoundException {
-        Model model = ObjReader.read("D:\\vsu\\3rd_semester\\cg\\" +
-                "_3rd_task\\src\\main\\resources\\obj\\pyramid.obj");
+        Model model = ObjReader.read(pyramidFilePath);
 
         Polygon randomPolygon = model.polygons.get(0);
 
@@ -66,8 +67,7 @@ public class NormalUtilsTest {
 
     @Test
     public void normalToPolygon4() throws FileNotFoundException {
-        Model model = ObjReader.read("D:\\vsu\\3rd_semester\\cg\\" +
-                "_3rd_task\\src\\main\\resources\\obj\\pyramid.obj");
+        Model model = ObjReader.read(pyramidFilePath);
 
         Polygon randomPolygon = model.polygons.get(1);
 
@@ -83,8 +83,7 @@ public class NormalUtilsTest {
 
     @Test
     public void selectPolygonsSurroundingVertex1() throws FileNotFoundException {
-        Model model = ObjReader.read("D:\\vsu\\3rd_semester\\cg\\" +
-                "_3rd_task\\src\\main\\resources\\obj\\pyramid.obj");
+        Model model = ObjReader.read(pyramidFilePath);
 
         List<Polygon> result = NormalUtils.selectPolygonsSurroundingVertex(
                 model.vertices.get(0), model.vertices, model.polygons
@@ -100,8 +99,7 @@ public class NormalUtilsTest {
 
     @Test
     public void normalToVertex1() throws FileNotFoundException {
-        Model model = ObjReader.read("D:\\vsu\\3rd_semester\\cg\\" +
-                "_3rd_task\\src\\main\\resources\\obj\\brick.obj");
+        Model model = ObjReader.read(brickFilePath);
 
         Vector3f result = NormalUtils.normalToVertex(
                 model.vertices.get(7), model.vertices, model.polygons
@@ -114,8 +112,7 @@ public class NormalUtilsTest {
 
     @Test
     public void normalToVertex2() throws FileNotFoundException {
-        Model model = ObjReader.read("D:\\vsu\\3rd_semester\\cg\\" +
-                "_3rd_task\\src\\main\\resources\\obj\\pyramid.obj");
+        Model model = ObjReader.read(pyramidFilePath);
 
         Vector3f result = NormalUtils.normalToVertex(
                 model.vertices.get(3), model.vertices, model.polygons
