@@ -1,92 +1,255 @@
 package cg.vsu.normals.pertsev;
 
-import cg.vsu.math.pertsev.GeometryUtils;
 import cg.vsu.model.Model;
 import cg.vsu.model.Polygon;
 import cg.vsu.render.math.vector.Vector3f;
-import com.cgvsu.objreader.ObjReader;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class NormalUtilsTest {
-    private final String projectDir = System.getProperty("user.dir");
-    private final String brickFilePath = projectDir + "\\src\\main\\resources\\obj\\brick.obj";
-    private final String pyramidFilePath = projectDir + "\\src\\main\\resources\\obj\\pyramid.obj";
+    private static Model constructBrickModel() {
+        Model model = new Model();
+
+        model.vertices = new ArrayList<>(List.of(new Vector3f[]{
+                new Vector3f(0, 0, 0),
+                new Vector3f(0, 2, 0),
+                new Vector3f(1, 2, 0),
+                new Vector3f(1, 0, 0),
+                new Vector3f(0, 0, 1),
+                new Vector3f(0, 2, 1),
+                new Vector3f(1, 2, 1),
+                new Vector3f(1, 0, 1)
+        }));
+
+        model.polygons = new ArrayList<>(List.of(
+                new Polygon(), new Polygon(), new Polygon(),
+                new Polygon(), new Polygon(), new Polygon()
+        ));
+
+        model.polygons.get(0).setVertexIndices(new ArrayList<>(List.of(new Integer[]{0, 1, 2, 3})));
+        model.polygons.get(1).setVertexIndices(new ArrayList<>(List.of(new Integer[]{0, 4, 5, 1})));
+        model.polygons.get(2).setVertexIndices(new ArrayList<>(List.of(new Integer[]{3, 7, 4, 0})));
+        model.polygons.get(3).setVertexIndices(new ArrayList<>(List.of(new Integer[]{2, 6, 5, 1})));
+        model.polygons.get(4).setVertexIndices(new ArrayList<>(List.of(new Integer[]{3, 7, 6, 2})));
+        model.polygons.get(5).setVertexIndices(new ArrayList<>(List.of(new Integer[]{7, 4, 5, 6})));
+
+
+        return model;
+    }
+
+    private static Model constructPyramidModel() {
+        Model model = new Model();
+
+        model.vertices = new ArrayList<>(List.of(new Vector3f[]{
+                new Vector3f(0, 0, 0),
+                new Vector3f(2, 0, 0),
+                new Vector3f(1, 2, 0),
+                new Vector3f(1, 1, 1)
+        }));
+
+        model.polygons = new ArrayList<>(List.of(
+                new Polygon(), new Polygon(),
+                new Polygon(), new Polygon()
+        ));
+
+        model.polygons.get(0).setVertexIndices(new ArrayList<>(List.of(new Integer[]{1, 0, 2})));
+        model.polygons.get(1).setVertexIndices(new ArrayList<>(List.of(new Integer[]{0, 3, 1})));
+        model.polygons.get(2).setVertexIndices(new ArrayList<>(List.of(new Integer[]{2, 3, 0})));
+        model.polygons.get(3).setVertexIndices(new ArrayList<>(List.of(new Integer[]{1, 3, 2})));
+
+        return model;
+    }
 
     @Test
-    public void normalToPolygon1() throws FileNotFoundException {
-        Model model = ObjReader.read(brickFilePath);
+
+    public void normalToPolygon1() {
+        Model model = constructBrickModel();
 
         Polygon randomPolygon = model.polygons.get(0);
 
-        Vector3f result = NormalUtils.normalToPolygon(randomPolygon, model.vertices);
+        Vector3f result = NormalUtils.polygonNormal(randomPolygon, model.vertices);
 
         Vector3f vertex1 = model.vertices.get(randomPolygon.getVertexIndices().get(0));
         Vector3f vertex2 = model.vertices.get(randomPolygon.getVertexIndices().get(1));
-        Vector3f randomPolygonVector = new Vector3f(vertex2.x - vertex1.x,
-                vertex2.y - vertex1.y, vertex2.z - vertex1.z);
+        Vector3f vertex3 = model.vertices.get(randomPolygon.getVertexIndices().get(2));
 
-        Assertions.assertTrue(GeometryUtils.scalarProductV3(randomPolygonVector, result) == 0);
+        Vector3f randomPolygonVector1 = new Vector3f(vertex2.x - vertex1.x, vertex2.y - vertex1.y, vertex2.z - vertex1.z);
+        Vector3f randomPolygonVector2 = new Vector3f(vertex3.x - vertex1.x, vertex3.y - vertex1.y, vertex3.z - vertex1.z);
+
+        Assertions.assertTrue(randomPolygonVector1.isOrthogonal(result) && randomPolygonVector2.isOrthogonal(result));
     }
 
     @Test
-    public void normalToPolygon2() throws FileNotFoundException {
-        Model model = ObjReader.read(brickFilePath);
+    public void normalToPolygon2() {
+        Model model = constructBrickModel();
 
         Polygon randomPolygon = model.polygons.get(1);
 
-        Vector3f result = NormalUtils.normalToPolygon(randomPolygon, model.vertices);
+        Vector3f result = NormalUtils.polygonNormal(randomPolygon, model.vertices);
 
         Vector3f vertex1 = model.vertices.get(randomPolygon.getVertexIndices().get(0));
         Vector3f vertex2 = model.vertices.get(randomPolygon.getVertexIndices().get(1));
-        Vector3f randomPolygonVector = new Vector3f(vertex2.x - vertex1.x,
-                vertex2.y - vertex1.y, vertex2.z - vertex1.z);
+        Vector3f vertex3 = model.vertices.get(randomPolygon.getVertexIndices().get(2));
 
-        Assertions.assertTrue(GeometryUtils.scalarProductV3(randomPolygonVector, result) == 0);
+        Vector3f randomPolygonVector1 = new Vector3f(vertex2.x - vertex1.x, vertex2.y - vertex1.y, vertex2.z - vertex1.z);
+        Vector3f randomPolygonVector2 = new Vector3f(vertex3.x - vertex1.x, vertex3.y - vertex1.y, vertex3.z - vertex1.z);
+
+        Assertions.assertTrue(randomPolygonVector1.isOrthogonal(result) && randomPolygonVector2.isOrthogonal(result));
     }
 
     @Test
-    public void normalToPolygon3() throws FileNotFoundException {
-        Model model = ObjReader.read(pyramidFilePath);
+    public void normalToPolygon3() {
+        Model model = constructBrickModel();
+
+        Polygon randomPolygon = model.polygons.get(2);
+
+        Vector3f result = NormalUtils.polygonNormal(randomPolygon, model.vertices);
+
+        Vector3f vertex1 = model.vertices.get(randomPolygon.getVertexIndices().get(0));
+        Vector3f vertex2 = model.vertices.get(randomPolygon.getVertexIndices().get(1));
+        Vector3f vertex3 = model.vertices.get(randomPolygon.getVertexIndices().get(2));
+
+        Vector3f randomPolygonVector1 = new Vector3f(vertex2.x - vertex1.x, vertex2.y - vertex1.y, vertex2.z - vertex1.z);
+        Vector3f randomPolygonVector2 = new Vector3f(vertex3.x - vertex1.x, vertex3.y - vertex1.y, vertex3.z - vertex1.z);
+
+        Assertions.assertTrue(randomPolygonVector1.isOrthogonal(result) && randomPolygonVector2.isOrthogonal(result));
+    }
+
+    @Test
+    public void normalToPolygon4() {
+        Model model = constructBrickModel();
+
+        Polygon randomPolygon = model.polygons.get(3);
+
+        Vector3f result = NormalUtils.polygonNormal(randomPolygon, model.vertices);
+
+        Vector3f vertex1 = model.vertices.get(randomPolygon.getVertexIndices().get(0));
+        Vector3f vertex2 = model.vertices.get(randomPolygon.getVertexIndices().get(1));
+        Vector3f vertex3 = model.vertices.get(randomPolygon.getVertexIndices().get(2));
+
+        Vector3f randomPolygonVector1 = new Vector3f(vertex2.x - vertex1.x, vertex2.y - vertex1.y, vertex2.z - vertex1.z);
+        Vector3f randomPolygonVector2 = new Vector3f(vertex3.x - vertex1.x, vertex3.y - vertex1.y, vertex3.z - vertex1.z);
+
+        Assertions.assertTrue(randomPolygonVector1.isOrthogonal(result) && randomPolygonVector2.isOrthogonal(result));
+    }
+
+    @Test
+    public void normalToPolygon5() {
+        Model model = constructBrickModel();
+
+        Polygon randomPolygon = model.polygons.get(4);
+
+        Vector3f result = NormalUtils.polygonNormal(randomPolygon, model.vertices);
+
+        Vector3f vertex1 = model.vertices.get(randomPolygon.getVertexIndices().get(0));
+        Vector3f vertex2 = model.vertices.get(randomPolygon.getVertexIndices().get(1));
+        Vector3f vertex3 = model.vertices.get(randomPolygon.getVertexIndices().get(2));
+
+        Vector3f randomPolygonVector1 = new Vector3f(vertex2.x - vertex1.x, vertex2.y - vertex1.y, vertex2.z - vertex1.z);
+        Vector3f randomPolygonVector2 = new Vector3f(vertex3.x - vertex1.x, vertex3.y - vertex1.y, vertex3.z - vertex1.z);
+
+        Assertions.assertTrue(randomPolygonVector1.isOrthogonal(result) && randomPolygonVector2.isOrthogonal(result));
+    }
+
+    @Test
+    public void normalToPolygon6() {
+        Model model = constructBrickModel();
+
+        Polygon randomPolygon = model.polygons.get(5);
+
+        Vector3f result = NormalUtils.polygonNormal(randomPolygon, model.vertices);
+
+        Vector3f vertex1 = model.vertices.get(randomPolygon.getVertexIndices().get(0));
+        Vector3f vertex2 = model.vertices.get(randomPolygon.getVertexIndices().get(1));
+        Vector3f vertex3 = model.vertices.get(randomPolygon.getVertexIndices().get(2));
+
+        Vector3f randomPolygonVector1 = new Vector3f(vertex2.x - vertex1.x, vertex2.y - vertex1.y, vertex2.z - vertex1.z);
+        Vector3f randomPolygonVector2 = new Vector3f(vertex3.x - vertex1.x, vertex3.y - vertex1.y, vertex3.z - vertex1.z);
+
+        Assertions.assertTrue(randomPolygonVector1.isOrthogonal(result) && randomPolygonVector2.isOrthogonal(result));
+    }
+
+
+    @Test
+    public void normalToPolygon7() {
+        Model model = constructPyramidModel();
 
         Polygon randomPolygon = model.polygons.get(0);
 
-        Vector3f result = NormalUtils.normalToPolygon(randomPolygon, model.vertices);
+        Vector3f result = NormalUtils.polygonNormal(randomPolygon, model.vertices);
 
         Vector3f vertex1 = model.vertices.get(randomPolygon.getVertexIndices().get(0));
         Vector3f vertex2 = model.vertices.get(randomPolygon.getVertexIndices().get(1));
-        Vector3f randomPolygonVector = new Vector3f(vertex2.x - vertex1.x,
-                vertex2.y - vertex1.y, vertex2.z - vertex1.z);
+        Vector3f vertex3 = model.vertices.get(randomPolygon.getVertexIndices().get(2));
 
-        Assertions.assertTrue(GeometryUtils.scalarProductV3(randomPolygonVector, result) == 0);
+        Vector3f randomPolygonVector1 = new Vector3f(vertex2.x - vertex1.x, vertex2.y - vertex1.y, vertex2.z - vertex1.z);
+        Vector3f randomPolygonVector2 = new Vector3f(vertex3.x - vertex1.x, vertex3.y - vertex1.y, vertex3.z - vertex1.z);
+
+        Assertions.assertTrue(randomPolygonVector1.isOrthogonal(result) && randomPolygonVector2.isOrthogonal(result));
     }
 
     @Test
-    public void normalToPolygon4() throws FileNotFoundException {
-        Model model = ObjReader.read(pyramidFilePath);
+    public void normalToPolygon8() {
+        Model model = constructPyramidModel();
 
         Polygon randomPolygon = model.polygons.get(1);
 
-        Vector3f result = NormalUtils.normalToPolygon(randomPolygon, model.vertices);
+        Vector3f result = NormalUtils.polygonNormal(randomPolygon, model.vertices);
 
         Vector3f vertex1 = model.vertices.get(randomPolygon.getVertexIndices().get(0));
         Vector3f vertex2 = model.vertices.get(randomPolygon.getVertexIndices().get(1));
-        Vector3f randomPolygonVector = new Vector3f(vertex2.x - vertex1.x,
-                vertex2.y - vertex1.y, vertex2.z - vertex1.z);
+        Vector3f vertex3 = model.vertices.get(randomPolygon.getVertexIndices().get(2));
 
-        Assertions.assertTrue(GeometryUtils.scalarProductV3(randomPolygonVector, result) == 0);
+        Vector3f randomPolygonVector1 = new Vector3f(vertex2.x - vertex1.x, vertex2.y - vertex1.y, vertex2.z - vertex1.z);
+        Vector3f randomPolygonVector2 = new Vector3f(vertex3.x - vertex1.x, vertex3.y - vertex1.y, vertex3.z - vertex1.z);
+
+        Assertions.assertTrue(randomPolygonVector1.isOrthogonal(result) && randomPolygonVector2.isOrthogonal(result));
     }
 
     @Test
-    public void selectPolygonsSurroundingVertex1() throws FileNotFoundException {
-        Model model = ObjReader.read(pyramidFilePath);
+    public void normalToPolygon9() {
+        Model model = constructPyramidModel();
+
+        Polygon randomPolygon = model.polygons.get(2);
+
+        Vector3f result = NormalUtils.polygonNormal(randomPolygon, model.vertices);
+        Vector3f vertex1 = model.vertices.get(randomPolygon.getVertexIndices().get(0));
+        Vector3f vertex2 = model.vertices.get(randomPolygon.getVertexIndices().get(1));
+        Vector3f vertex3 = model.vertices.get(randomPolygon.getVertexIndices().get(2));
+
+        Vector3f randomPolygonVector1 = new Vector3f(vertex2.x - vertex1.x, vertex2.y - vertex1.y, vertex2.z - vertex1.z);
+        Vector3f randomPolygonVector2 = new Vector3f(vertex3.x - vertex1.x, vertex3.y - vertex1.y, vertex3.z - vertex1.z);
+
+        Assertions.assertTrue(randomPolygonVector1.isOrthogonal(result) && randomPolygonVector2.isOrthogonal(result));
+    }
+
+    @Test
+    public void normalToPolygon10() {
+        Model model = constructPyramidModel();
+
+        Polygon randomPolygon = model.polygons.get(3);
+
+        Vector3f result = NormalUtils.polygonNormal(randomPolygon, model.vertices);
+
+        Vector3f vertex1 = model.vertices.get(randomPolygon.getVertexIndices().get(0));
+        Vector3f vertex2 = model.vertices.get(randomPolygon.getVertexIndices().get(1));
+        Vector3f vertex3 = model.vertices.get(randomPolygon.getVertexIndices().get(2));
+
+        Vector3f randomPolygonVector1 = new Vector3f(vertex2.x - vertex1.x, vertex2.y - vertex1.y, vertex2.z - vertex1.z);
+        Vector3f randomPolygonVector2 = new Vector3f(vertex3.x - vertex1.x, vertex3.y - vertex1.y, vertex3.z - vertex1.z);
+
+        Assertions.assertTrue(randomPolygonVector1.isOrthogonal(result) && randomPolygonVector2.isOrthogonal(result));
+    }
+
+    @Test
+    public void selectPolygonsSurroundingVertex1() {
+        Model model = constructPyramidModel();
 
         List<Polygon> result = NormalUtils.selectPolygonsSurroundingVertex(
-                model.vertices.get(0), model.vertices, model.polygons
+                0, model.vertices, model.polygons
         );
 
         List<Polygon> expected = new ArrayList<>();
@@ -98,12 +261,10 @@ public class NormalUtilsTest {
     }
 
     @Test
-    public void normalToVertex1() throws FileNotFoundException {
-        Model model = ObjReader.read(brickFilePath);
+    public void normalToVertex1() {
+        Model model = constructBrickModel();
 
-        Vector3f result = NormalUtils.normalToVertex(
-                model.vertices.get(7), model.vertices, model.polygons
-        );
+        Vector3f result = NormalUtils.vertexNormal(7, model.vertices, model.polygons);
 
         Vector3f expected = new Vector3f((float) -1 / 3, (float) -1 / 3, (float) -1 / 3).nor();
 
@@ -111,16 +272,15 @@ public class NormalUtilsTest {
     }
 
     @Test
-    public void normalToVertex2() throws FileNotFoundException {
-        Model model = ObjReader.read(pyramidFilePath);
+    public void normalToVertex2() {
+        Model model = constructPyramidModel();
 
-        Vector3f result = NormalUtils.normalToVertex(
-                model.vertices.get(3), model.vertices, model.polygons
-        );
-
+        Vector3f result = NormalUtils.vertexNormal(3, model.vertices, model.polygons);
         Vector3f expected = new Vector3f(
-                (float) (2 * Math.sqrt(6) / 9), (float) (-Math.sqrt(2) / 6), (float) (Math.sqrt(2) / 6)
-        ).nor();
+                0,
+                (float) (1 / Math.sqrt(2)) - (float) (2 / Math.sqrt(6)),
+                (float) -(1 / Math.sqrt(2)) - (float) (2 / Math.sqrt(6))
+        ).div(3).nor();
 
         Assertions.assertTrue(expected.nor().epsEquals(result.nor(), (float) 1e-7));
     }

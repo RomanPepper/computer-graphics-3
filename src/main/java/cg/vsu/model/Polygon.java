@@ -1,18 +1,18 @@
 package cg.vsu.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Polygon {
-
-    private ArrayList<Integer> vertexIndices;
-    private ArrayList<Integer> textureVertexIndices;
-    private ArrayList<Integer> normalIndices;
+    private List<Integer> vertexIndices;
+    private List<Integer> textureVertexIndices;
+    private List<Integer> normalIndices;
 
 
     public Polygon() {
-        vertexIndices = new ArrayList<Integer>();
-        textureVertexIndices = new ArrayList<Integer>();
-        normalIndices = new ArrayList<Integer>();
+        vertexIndices = new ArrayList<>();
+        textureVertexIndices = new ArrayList<>();
+        normalIndices = new ArrayList<>();
     }
 
     public void setVertexIndices(ArrayList<Integer> vertexIndices) {
@@ -30,15 +30,15 @@ public class Polygon {
         this.normalIndices = normalIndices;
     }
 
-    public ArrayList<Integer> getVertexIndices() {
+    public List<Integer> getVertexIndices() {
         return vertexIndices;
     }
 
-    public ArrayList<Integer> getTextureVertexIndices() {
+    public List<Integer> getTextureVertexIndices() {
         return textureVertexIndices;
     }
 
-    public ArrayList<Integer> getNormalIndices() {
+    public List<Integer> getNormalIndices() {
         return normalIndices;
     }
 }

@@ -1,6 +1,6 @@
 package cg.vsu.normals.pertsev;
 
-import cg.vsu.math.pertsev.GeometryUtils;
+import cg.vsu.model.Model;
 import cg.vsu.model.Polygon;
 import cg.vsu.render.math.vector.Vector3f;
 
@@ -8,17 +8,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Library for finding normals to a 3D model
+ * Library for calculating normals to a 3D model
  *
  * @author Pertsev Roman
  */
 public class NormalUtils {
+
+    /**
+     * @param model model to calculate its normals
+     */
+    public static void calculateModelNormals(Model model) {
+        for (int i = 0; i < model.vertices.size(); i++) {
+            model.normals.set(i, vertexNormal(i, model.vertices, model.polygons));
+        }
+    }
+
+    /**
+     * @param vertices all model vertices list
+     * @param normals all model normals list
+     * @param polygons all model polygons list
+     */
+    public static void calculateModelNormals(List<Vector3f> vertices, List<Vector3f> normals, List<Polygon> polygons) {
+        for (int i = 0; i < vertices.size(); i++) {
+            normals.set(i, vertexNormal(i, vertices, polygons));
+        }
+    }
+
     /**
      * @param polygon  input polygon
      * @param vertices all model vertices list
      * @return normal vector to input polygon
      */
-    public static Vector3f normalToPolygon(Polygon polygon, List<Vector3f> vertices) {
+    public static Vector3f polygonNormal(Polygon polygon, List<Vector3f> vertices) {
         List<Integer> vertexIndices = polygon.getVertexIndices();
 
         if (vertexIndices.size() < 3)
@@ -31,24 +52,27 @@ public class NormalUtils {
         Vector3f vertex3 = vertices.get(vertexIndices.get(2));
 
         //vectors in the polygon flat
-        Vector3f vector1 = new Vector3f(vertex2.x - vertex1.x, vertex2.y - vertex1.y, vertex2.z - vertex1.z);
-        Vector3f vector2 = new Vector3f(vertex3.x - vertex1.x, vertex3.y - vertex1.y, vertex3.z - vertex1.z);
+        Vector3f vector1 = new Vector3f(vertex2.x - vertex1.x, vertex2.y - vertex1.y, vertex2.z - vertex1.z).nor();
+        Vector3f vector2 = new Vector3f(vertex3.x - vertex1.x, vertex3.y - vertex1.y, vertex3.z - vertex1.z).nor();
 
-        return GeometryUtils.vectorProduct(vector1, vector2).nor();
+        return vector1.crs(vector2).nor();
     }
 
     /**
-     * @param vertex   input vertex
-     * @param vertices all model vertices list
-     * @param polygons all model polygons list
+     * @param vertexIndex vertex index
+     * @param vertices    all model vertices list
+     * @param polygons    all model polygons list
      * @return normal vector to vertex relative to model
      */
-    public static Vector3f normalToVertex(Vector3f vertex, List<Vector3f> vertices, List<Polygon> polygons) {
-        List<Polygon> polygonsSurroundingVertex = selectPolygonsSurroundingVertex(vertex, vertices, polygons);
+    public static Vector3f vertexNormal(Integer vertexIndex, List<Vector3f> vertices, List<Polygon> polygons) {
+        // Вариант, куда передают все вершины модели
+        List<Polygon> polygonsSurroundingVertex = selectPolygonsSurroundingVertex(
+                vertexIndex, vertices, polygons
+        );
 
         Vector3f sumVector = new Vector3f();
         for (Polygon polygon : polygonsSurroundingVertex) {
-            sumVector.add(normalToPolygon(polygon, vertices));
+            sumVector.add(polygonNormal(polygon, vertices).nor());
         }
 
         // return average vector
@@ -57,13 +81,14 @@ public class NormalUtils {
 
     /**
      * Support method for "normalToVertex"
-     * @param vertex   input vertex
-     * @param vertices all model vertices list
-     * @param polygons all model polygons list
+     *
+     * @param vertexIndex vertex index
+     * @param vertices    all model vertices list
+     * @param polygons    all model polygons list
      * @return polygons which bordering input vertex
      */
-    protected static List<Polygon> selectPolygonsSurroundingVertex(Vector3f vertex, List<Vector3f> vertices,
-                                                                 List<Polygon> polygons) {
+    protected static List<Polygon> selectPolygonsSurroundingVertex(Integer vertexIndex, List<Vector3f> vertices,
+                                                                   List<Polygon> polygons) {
         if (vertices.isEmpty())
             throw new IllegalArgumentException("Vertex array must be not empty");
         if (polygons.isEmpty())
@@ -73,7 +98,7 @@ public class NormalUtils {
 
         for (Polygon polygon : polygons) {
             for (Integer index : polygon.getVertexIndices()) {
-                if (vertices.get(index).equals(vertex)) {
+                if (vertices.get(index).equals(vertices.get(vertexIndex))) {
                     polygonsSurroundingVertex.add(polygon);
                     break;
                 }
