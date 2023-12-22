@@ -13,22 +13,13 @@ import java.util.List;
  * @author Pertsev Roman
  */
 public class NormalUtils {
-
-    /**
-     * @param model model to calculate its normals
-     */
-    public static void calculateModelNormals(Model model) {
-        for (int i = 0; i < model.vertices.size(); i++) {
-            model.normals.set(i, vertexNormal(i, model.vertices, model.polygons));
-        }
-    }
-
     /**
      * @param vertices all model vertices list
      * @param normals all model normals list
      * @param polygons all model polygons list
      */
-    public static void calculateModelNormals(List<Vector3f> vertices, List<Vector3f> normals, List<Polygon> polygons) {
+    public static void calculateModelNormals(List<Vector3f> vertices, List<Vector3f> normals,
+                                             List<Polygon> polygons) {
         for (int i = 0; i < vertices.size(); i++) {
             normals.set(i, vertexNormal(i, vertices, polygons));
         }
